@@ -85,7 +85,7 @@ class Accordion {
     let index = [...this.buttonElements].indexOf(button);
     let animation = this.animations[index];
     if (animation) animation.cancel();
-    let panel = document.getElementById(button.getAttribute('aria-controls')!) as HTMLElement;
+    let panel = document.getElementById(button.getAttribute('aria-controls')!)!;
     panel.removeAttribute('hidden');
     animation = this.animations[index] = section.animate({ height: [height, `${button.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
