@@ -3,7 +3,7 @@ type AccordionOptions = {
     section: string;
     header: string;
     button: string;
-    panel: string;
+    content: string;
   };
   animation: {
     duration: number;
@@ -18,7 +18,7 @@ class Accordion {
   sectionElements: NodeListOf<HTMLElement>;
   headerElements: NodeListOf<HTMLElement>;
   buttonElements: NodeListOf<HTMLElement>;
-  panelElements: NodeListOf<HTMLElement>;
+  contentElements: NodeListOf<HTMLElement>;
   animations: (Animation | null)[] = [];
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
@@ -28,7 +28,7 @@ class Accordion {
         section: ':has(> [data-accordion-header])',
         header: '[data-accordion-header]',
         button: '[data-accordion-button]',
-        panel: '[data-accordion-header] + *',
+        content: '[data-accordion-header] + *',
       },
       animation: {
         duration: 300,
@@ -40,12 +40,12 @@ class Accordion {
       animation: { ...this.defaults.animation, ...options?.animation },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
-    let NOT_NESTED = `:not(:scope ${this.settings.selector.panel} *)`;
+    let NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
     this.sectionElements = this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`);
     this.headerElements = this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
     this.buttonElements = this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`);
-    this.panelElements = this.rootElement.querySelectorAll(`${this.settings.selector.panel}${NOT_NESTED}`);
-    if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.panelElements.length) return;
+    this.contentElements = this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`);
+    if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) return;
     this.animations = Array(this.sectionElements.length).fill(null);
     this.initialize();
   }
@@ -53,17 +53,17 @@ class Accordion {
   private initialize(): void {
     this.buttonElements.forEach((button, i) => {
       let id = Math.random().toString(36).slice(-8);
-      button.setAttribute('aria-controls', (this.panelElements[i].id ||= `accordion-panel-${id}`));
+      button.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
       button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
       button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
       if (!this.isFocusable(button)) button.style.setProperty('pointer-events', 'none');
       button.addEventListener('click', event => this.handleButtonClick(event));
       button.addEventListener('keydown', event => this.handleButtonKeyDown(event));
     });
-    this.panelElements.forEach((panel, i) => {
-      panel.setAttribute('aria-labelledby', `${panel.getAttribute('aria-labelledby') || ''} ${this.buttonElements[i].getAttribute('id')}`.trim());
-      panel.setAttribute('role', 'region');
-      panel.addEventListener('beforematch', event => this.handlePanelBeforeMatch(event));
+    this.contentElements.forEach((content, i) => {
+      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.buttonElements[i].getAttribute('id')}`.trim());
+      content.setAttribute('role', 'region');
+      content.addEventListener('beforematch', event => this.handleContentBeforeMatch(event));
     });
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
@@ -85,12 +85,12 @@ class Accordion {
     let index = [...this.buttonElements].indexOf(button);
     let animation = this.animations[index];
     if (animation) animation.cancel();
-    let panel = document.getElementById(button.getAttribute('aria-controls')!)!;
-    panel.removeAttribute('hidden');
-    animation = this.animations[index] = section.animate({ height: [height, `${button.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? panel.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
+    let content = document.getElementById(button.getAttribute('aria-controls')!)!;
+    content.removeAttribute('hidden');
+    animation = this.animations[index] = section.animate({ height: [height, `${button.closest(this.settings.selector.header)!.scrollHeight + (isOpen ? content.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
       this.animations[index] = null;
-      if (!isOpen) panel.setAttribute('hidden', 'until-found');
+      if (!isOpen) content.setAttribute('hidden', 'until-found');
       ['height', 'overflow'].forEach(name => section.style.removeProperty(name));
     });
   }
@@ -128,7 +128,7 @@ class Accordion {
     focusables[newIndex].focus();
   }
 
-  private handlePanelBeforeMatch(event: Event): void {
+  private handleContentBeforeMatch(event: Event): void {
     let button = document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement;
     if (button.getAttribute('aria-expanded') === 'true') return;
     this.open(button, true);
