@@ -25,6 +25,9 @@ class Accordion {
     this.contentElements = this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`);
     if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) return;
     this.animations = Array(this.sectionElements.length).fill(null);
+    this.handleButtonClick = this.handleButtonClick.bind(this);
+    this.handleButtonKeyDown = this.handleButtonKeyDown.bind(this);
+    this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
     this.initialize();
   }
 
@@ -35,13 +38,13 @@ class Accordion {
       button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
       button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
       if (!this.isFocusable(button)) button.style.setProperty('pointer-events', 'none');
-      button.addEventListener('click', event => this.handleButtonClick(event));
-      button.addEventListener('keydown', event => this.handleButtonKeyDown(event));
+      button.addEventListener('click', this.handleButtonClick);
+      button.addEventListener('keydown', this.handleButtonKeyDown);
     });
     this.contentElements.forEach((content, i) => {
       content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.buttonElements[i].getAttribute('id')}`.trim());
       content.setAttribute('role', 'region');
-      content.addEventListener('beforematch', event => this.handleContentBeforeMatch(event));
+      content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
