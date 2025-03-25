@@ -60,7 +60,7 @@ class Accordion {
       if (isOpen && opened && opened !== button) this.close(opened, isMatch);
     }
     let section = button.closest(this.settings.selector.section);
-    let height = `${section.offsetHeight}px`;
+    let blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
     window.requestAnimationFrame(() => button.setAttribute('aria-expanded', String(isOpen)));
     section.style.setProperty('overflow', 'clip');
     let index = [...this.buttonElements].indexOf(button);
@@ -68,11 +68,11 @@ class Accordion {
     if (animation) animation.cancel();
     let content = document.getElementById(button.getAttribute('aria-controls'));
     content.removeAttribute('hidden');
-    animation = this.animations[index] = section.animate({ height: [height, `${button.closest(this.settings.selector.header).scrollHeight + (isOpen ? content.scrollHeight : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
+    animation = this.animations[index] = section.animate({ blockSize: [blockSize, `${parseInt(window.getComputedStyle(button.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
       this.animations[index] = null;
       if (!isOpen) content.setAttribute('hidden', 'until-found');
-      ['height', 'overflow'].forEach(name => section.style.removeProperty(name));
+      ['block-size', 'overflow'].forEach(name => section.style.removeProperty(name));
     });
   }
 
