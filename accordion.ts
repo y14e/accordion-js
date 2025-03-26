@@ -12,14 +12,14 @@ type AccordionOptions = {
 };
 
 class Accordion {
-  rootElement: HTMLElement;
-  defaults: AccordionOptions;
-  settings: AccordionOptions;
-  sectionElements: NodeListOf<HTMLElement>;
-  headerElements: NodeListOf<HTMLElement>;
-  buttonElements: NodeListOf<HTMLElement>;
-  contentElements: NodeListOf<HTMLElement>;
-  animations: (Animation | null)[] = [];
+  private rootElement: HTMLElement;
+  private defaults: AccordionOptions;
+  private settings: AccordionOptions;
+  private sectionElements: NodeListOf<HTMLElement>;
+  private headerElements: NodeListOf<HTMLElement>;
+  private buttonElements: NodeListOf<HTMLElement>;
+  private contentElements: NodeListOf<HTMLElement>;
+  private animations: (Animation | null)[] = [];
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
     this.rootElement = root;
