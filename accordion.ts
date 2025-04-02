@@ -56,7 +56,7 @@ class Accordion {
   private initialize(): void {
     this.buttonElements.forEach((button, i) => {
       let id = Math.random().toString(36).slice(-8);
-      button.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
+      button.setAttribute('aria-controls', (this.contentElements[i]!.id ||= `accordion-content-${id}`));
       button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
       button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
       if (!this.isFocusable(button)) button.style.setProperty('pointer-events', 'none');
@@ -64,7 +64,7 @@ class Accordion {
       button.addEventListener('keydown', this.handleButtonKeyDown);
     });
     this.contentElements.forEach((content, i) => {
-      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.buttonElements[i].getAttribute('id')}`.trim());
+      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.buttonElements[i]!.getAttribute('id')}`.trim());
       content.setAttribute('role', 'region');
       content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
@@ -128,7 +128,7 @@ class Accordion {
         newIndex = length - 1;
         break;
     }
-    focusables[newIndex].focus();
+    focusables[newIndex]!.focus();
   }
 
   private handleContentBeforeMatch(event: Event): void {
