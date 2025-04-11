@@ -11,7 +11,7 @@ type AccordionOptions = {
   };
 };
 
-class Accordion {
+export class Accordion {
   private rootElement: HTMLElement;
   private defaults: AccordionOptions;
   private settings: AccordionOptions;
@@ -147,5 +147,3 @@ class Accordion {
     this.toggle(button, false, isMatch);
   }
 }
-
-export default Accordion;

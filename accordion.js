@@ -1,4 +1,4 @@
-class Accordion {
+export class Accordion {
   constructor(root, options) {
     this.rootElement = root;
     this.defaults = {
@@ -125,5 +125,3 @@ class Accordion {
     this.toggle(button, false, isMatch);
   }
 }
-
-export default Accordion;
