@@ -18,7 +18,7 @@ class Accordion {
       animation: { ...this.defaults.animation, ...options?.animation },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
-    let NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
+    const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
     this.sectionElements = this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`);
     this.headerElements = this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
     this.buttonElements = this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`);
@@ -33,7 +33,7 @@ class Accordion {
 
   initialize() {
     this.buttonElements.forEach((button, i) => {
-      let id = Math.random().toString(36).slice(-8);
+      const id = Math.random().toString(36).slice(-8);
       button.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
       button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
       button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
@@ -54,19 +54,19 @@ class Accordion {
   }
 
   toggle(button, isOpen, isMatch = false) {
-    let name = button.getAttribute('data-accordion-name');
+    const name = button.getAttribute('data-accordion-name');
     if (name) {
-      let opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
+      const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
       if (isOpen && opened && opened !== button) this.close(opened, isMatch);
     }
-    let section = button.closest(this.settings.selector.section);
-    let blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
+    const section = button.closest(this.settings.selector.section);
+    const blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
     window.requestAnimationFrame(() => button.setAttribute('aria-expanded', String(isOpen)));
     section.style.setProperty('overflow', 'clip');
-    let index = [...this.buttonElements].indexOf(button);
+    const index = [...this.buttonElements].indexOf(button);
     let animation = this.animations[index];
     if (animation) animation.cancel();
-    let content = document.getElementById(button.getAttribute('aria-controls'));
+    const content = document.getElementById(button.getAttribute('aria-controls'));
     content.removeAttribute('hidden');
     animation = this.animations[index] = section.animate({ blockSize: [blockSize, `${parseInt(window.getComputedStyle(button.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
@@ -78,22 +78,22 @@ class Accordion {
 
   handleButtonClick(event) {
     event.preventDefault();
-    let button = event.currentTarget;
+    const button = event.currentTarget;
     this.toggle(button, button.getAttribute('aria-expanded') !== 'true');
   }
 
   handleButtonKeyDown(event) {
-    let { key } = event;
+    const { key } = event;
     if (!['Enter', ' ', 'ArrowUp', 'ArrowDown', 'End', 'Home'].includes(key)) return;
     event.preventDefault();
-    let active = document.activeElement;
+    const active = document.activeElement;
     if (['Enter', ' '].includes(key)) {
       active.click();
       return;
     }
-    let focusables = [...this.buttonElements].filter(this.isFocusable);
-    let currentIndex = focusables.indexOf(active);
-    let length = focusables.length;
+    const focusables = [...this.buttonElements].filter(this.isFocusable);
+    const currentIndex = focusables.indexOf(active);
+    const length = focusables.length;
     let newIndex = 0;
     switch (key) {
       case 'ArrowUp':
@@ -110,7 +110,7 @@ class Accordion {
   }
 
   handleContentBeforeMatch(event) {
-    let button = document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
+    const button = document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
     if (button.getAttribute('aria-expanded') === 'true') return;
     this.open(button, true);
   }
