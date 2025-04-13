@@ -17,13 +17,17 @@ export class Accordion {
       selector: { ...this.defaults.selector, ...options?.selector },
       animation: { ...this.defaults.animation, ...options?.animation },
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.settings.animation.duration = 0;
+    }
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
     this.sectionElements = this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`);
     this.headerElements = this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
     this.buttonElements = this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`);
     this.contentElements = this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`);
-    if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) return;
+    if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) {
+      return;
+    }
     this.animations = Array(this.sectionElements.length).fill(null);
     this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleButtonKeyDown = this.handleButtonKeyDown.bind(this);
@@ -37,7 +41,9 @@ export class Accordion {
       button.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
       button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
       button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
-      if (!this.isFocusable(button)) button.style.setProperty('pointer-events', 'none');
+      if (!this.isFocusable(button)) {
+        button.style.setProperty('pointer-events', 'none');
+      }
       button.addEventListener('click', this.handleButtonClick);
       button.addEventListener('keydown', this.handleButtonKeyDown);
     });
@@ -57,22 +63,32 @@ export class Accordion {
     const name = button.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
-      if (isOpen && opened && opened !== button) this.close(opened, isMatch);
+      if (isOpen && opened && opened !== button) {
+        this.close(opened, isMatch);
+      }
     }
     const section = button.closest(this.settings.selector.section);
     const blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
-    window.requestAnimationFrame(() => button.setAttribute('aria-expanded', String(isOpen)));
+    window.requestAnimationFrame(() => {
+      button.setAttribute('aria-expanded', String(isOpen));
+    });
     section.style.setProperty('overflow', 'clip');
     const index = [...this.buttonElements].indexOf(button);
     let animation = this.animations[index];
-    if (animation) animation.cancel();
+    if (animation) {
+      animation.cancel();
+    }
     const content = document.getElementById(button.getAttribute('aria-controls'));
     content.removeAttribute('hidden');
     animation = this.animations[index] = section.animate({ blockSize: [blockSize, `${parseInt(window.getComputedStyle(button.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
     animation.addEventListener('finish', () => {
       this.animations[index] = null;
-      if (!isOpen) content.setAttribute('hidden', 'until-found');
-      ['block-size', 'overflow'].forEach(name => section.style.removeProperty(name));
+      if (!isOpen) {
+        content.setAttribute('hidden', 'until-found');
+      }
+      ['block-size', 'overflow'].forEach(name => {
+        section.style.removeProperty(name);
+      });
     });
   }
 
@@ -84,7 +100,9 @@ export class Accordion {
 
   handleButtonKeyDown(event) {
     const { key } = event;
-    if (!['Enter', ' ', 'ArrowUp', 'ArrowDown', 'End', 'Home'].includes(key)) return;
+    if (!['Enter', ' ', 'ArrowUp', 'ArrowDown', 'End', 'Home'].includes(key)) {
+      return;
+    }
     event.preventDefault();
     const active = document.activeElement;
     if (['Enter', ' '].includes(key)) {
@@ -111,17 +129,23 @@ export class Accordion {
 
   handleContentBeforeMatch(event) {
     const button = document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
-    if (button.getAttribute('aria-expanded') === 'true') return;
+    if (button.getAttribute('aria-expanded') === 'true') {
+      return;
+    }
     this.open(button, true);
   }
 
   open(button, isMatch = false) {
-    if (button.getAttribute('aria-expanded') === 'true') return;
+    if (button.getAttribute('aria-expanded') === 'true') {
+      return;
+    }
     this.toggle(button, true, isMatch);
   }
 
   close(button, isMatch = false) {
-    if (button.getAttribute('aria-expanded') !== 'true') return;
+    if (button.getAttribute('aria-expanded') !== 'true') {
+      return;
+    }
     this.toggle(button, false, isMatch);
   }
 }
