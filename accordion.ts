@@ -164,10 +164,10 @@ export class Accordion {
     this.toggle(button, true, isMatch);
   }
 
-  close(button: HTMLElement, isMatch = false): void {
+  close(button: HTMLElement): void {
     if (button.getAttribute('aria-expanded') !== 'true') {
       return;
     }
-    this.toggle(button, false, isMatch);
+    this.toggle(button, false);
   }
 }

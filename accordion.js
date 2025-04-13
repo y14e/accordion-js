@@ -142,10 +142,10 @@ export class Accordion {
     this.toggle(button, true, isMatch);
   }
 
-  close(button, isMatch = false) {
+  close(button) {
     if (button.getAttribute('aria-expanded') !== 'true') {
       return;
     }
-    this.toggle(button, false, isMatch);
+    this.toggle(button, false);
   }
 }
