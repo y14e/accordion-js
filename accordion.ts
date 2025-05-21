@@ -86,7 +86,7 @@ export class Accordion {
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
       if (isOpen && opened && opened !== button) {
-        this.close(opened, isMatch);
+        this.close(opened);
       }
     }
     const section = button.closest(this.settings.selector.section) as HTMLElement;
