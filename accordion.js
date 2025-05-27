@@ -100,7 +100,7 @@ export class Accordion {
 
   handleButtonKeyDown(event) {
     const { key } = event;
-    if (!['Enter', ' ', 'ArrowUp', 'ArrowDown', 'End', 'Home'].includes(key)) {
+    if (!['Enter', ' ', 'End', 'Home', 'ArrowUp', 'ArrowDown'].includes(key)) {
       return;
     }
     event.preventDefault();
@@ -112,16 +112,19 @@ export class Accordion {
     const focusables = [...this.buttonElements].filter(this.isFocusable);
     const currentIndex = focusables.indexOf(active);
     const length = focusables.length;
-    let newIndex = 0;
+    let newIndex;
     switch (key) {
+      case 'End':
+        newIndex = length - 1;
+        break;
+      case 'Home':
+        newIndex = 0;
+        break;
       case 'ArrowUp':
         newIndex = (currentIndex - 1 + length) % length;
         break;
       case 'ArrowDown':
         newIndex = (currentIndex + 1) % length;
-        break;
-      case 'End':
-        newIndex = length - 1;
         break;
     }
     focusables[newIndex].focus();
