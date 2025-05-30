@@ -36,8 +36,14 @@ export class Accordion {
       },
     };
     this.settings = {
-      selector: { ...this.defaults.selector, ...options?.selector },
-      animation: { ...this.defaults.animation, ...options?.animation },
+      selector: {
+        ...this.defaults.selector,
+        ...options?.selector,
+      },
+      animation: {
+        ...this.defaults.animation,
+        ...options?.animation,
+      },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this.settings.animation.duration = 0;
@@ -102,7 +108,15 @@ export class Accordion {
     }
     const content = document.getElementById(button.getAttribute('aria-controls')!)!;
     content.removeAttribute('hidden');
-    animation = this.animations[index] = section.animate({ blockSize: [blockSize, `${parseInt(window.getComputedStyle(button.closest(this.settings.selector.header)!).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`] }, { duration: !isMatch ? this.settings.animation.duration : 0, easing: this.settings.animation.easing });
+    animation = this.animations[index] = section.animate(
+      {
+        blockSize: [blockSize, `${parseInt(window.getComputedStyle(button.closest(this.settings.selector.header)!).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
+      },
+      {
+        duration: !isMatch ? this.settings.animation.duration : 0,
+        easing: this.settings.animation.easing,
+      },
+    );
     animation.addEventListener('finish', () => {
       this.animations[index] = null;
       if (!isOpen) {
