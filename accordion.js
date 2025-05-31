@@ -27,10 +27,10 @@ export class Accordion {
       this.settings.animation.duration = 0;
     }
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
-    this.sectionElements = this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`);
-    this.headerElements = this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
-    this.buttonElements = this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`);
-    this.contentElements = this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`);
+    this.sectionElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`)];
+    this.headerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`)];
+    this.buttonElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`)];
+    this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)];
     if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) {
       return;
     }
@@ -79,7 +79,7 @@ export class Accordion {
       button.setAttribute('aria-expanded', String(isOpen));
     });
     section.style.setProperty('overflow', 'clip');
-    const index = [...this.buttonElements].indexOf(button);
+    const index = this.buttonElements.indexOf(button);
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
@@ -123,7 +123,7 @@ export class Accordion {
       active.click();
       return;
     }
-    const focusables = [...this.buttonElements].filter(this.isFocusable);
+    const focusables = this.buttonElements.filter(this.isFocusable);
     const currentIndex = focusables.indexOf(active);
     const length = focusables.length;
     let newIndex;

@@ -15,10 +15,10 @@ export class Accordion {
   private rootElement: HTMLElement;
   private defaults: AccordionOptions;
   private settings: AccordionOptions;
-  private sectionElements: NodeListOf<HTMLElement>;
-  private headerElements: NodeListOf<HTMLElement>;
-  private buttonElements: NodeListOf<HTMLElement>;
-  private contentElements: NodeListOf<HTMLElement>;
+  private sectionElements: HTMLElement[];
+  private headerElements: HTMLElement[];
+  private buttonElements: HTMLElement[];
+  private contentElements: HTMLElement[];
   private animations: (Animation | null)[] = [];
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
@@ -49,10 +49,10 @@ export class Accordion {
       this.settings.animation.duration = 0;
     }
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
-    this.sectionElements = this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`);
-    this.headerElements = this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`);
-    this.buttonElements = this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`);
-    this.contentElements = this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`);
+    this.sectionElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`)] as HTMLElement[];
+    this.headerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`)] as HTMLElement[];
+    this.buttonElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`)] as HTMLElement[];
+    this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)] as HTMLElement[];
     if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) {
       return;
     }
@@ -101,7 +101,7 @@ export class Accordion {
       button.setAttribute('aria-expanded', String(isOpen));
     });
     section.style.setProperty('overflow', 'clip');
-    const index = [...this.buttonElements].indexOf(button);
+    const index = this.buttonElements.indexOf(button);
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
@@ -145,7 +145,7 @@ export class Accordion {
       active.click();
       return;
     }
-    const focusables = [...this.buttonElements].filter(this.isFocusable);
+    const focusables = this.buttonElements.filter(this.isFocusable);
     const currentIndex = focusables.indexOf(active);
     const length = focusables.length;
     let newIndex: number;
