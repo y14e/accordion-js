@@ -19,7 +19,7 @@ export class Accordion {
   private headerElements: HTMLElement[];
   private buttonElements: HTMLElement[];
   private contentElements: HTMLElement[];
-  private animations: (Animation | null)[] = [];
+  private animations!: (Animation | null)[];
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
     this.rootElement = root;
