@@ -118,13 +118,13 @@ export class Accordion {
       return;
     }
     event.preventDefault();
-    const active = document.activeElement;
+    const current = document.activeElement;
     if (['Enter', ' '].includes(key)) {
-      active.click();
+      current.click();
       return;
     }
     const focusables = this.buttonElements.filter(this.isFocusable);
-    const currentIndex = focusables.indexOf(active);
+    const currentIndex = focusables.indexOf(current);
     const length = focusables.length;
     let newIndex;
     switch (key) {
