@@ -2,7 +2,7 @@ type AccordionOptions = {
   selector: {
     section: string;
     header: string;
-    button: string;
+    trigger: string;
     content: string;
   };
   animation: {
@@ -17,7 +17,7 @@ export class Accordion {
   private settings: AccordionOptions;
   private sectionElements: HTMLElement[];
   private headerElements: HTMLElement[];
-  private buttonElements: HTMLElement[];
+  private triggerElements: HTMLElement[];
   private contentElements: HTMLElement[];
   private animations!: (Animation | null)[];
 
@@ -27,7 +27,7 @@ export class Accordion {
       selector: {
         section: ':has(> [data-accordion-header])',
         header: '[data-accordion-header]',
-        button: '[data-accordion-button]',
+        trigger: '[data-accordion-trigger]',
         content: '[data-accordion-header] + *',
       },
       animation: {
@@ -51,32 +51,32 @@ export class Accordion {
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
     this.sectionElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`)] as HTMLElement[];
     this.headerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`)] as HTMLElement[];
-    this.buttonElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`)] as HTMLElement[];
+    this.triggerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`)] as HTMLElement[];
     this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)] as HTMLElement[];
-    if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) {
+    if (!this.sectionElements.length || !this.headerElements.length || !this.triggerElements.length || !this.contentElements.length) {
       return;
     }
     this.animations = Array(this.sectionElements.length).fill(null);
-    this.handleButtonClick = this.handleButtonClick.bind(this);
-    this.handleButtonKeyDown = this.handleButtonKeyDown.bind(this);
+    this.handleTriggerClick = this.handleTriggerClick.bind(this);
+    this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
     this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
     this.initialize();
   }
 
   private initialize(): void {
-    this.buttonElements.forEach((button, i) => {
+    this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
-      button.setAttribute('aria-controls', (this.contentElements[i]!.id ||= `accordion-content-${id}`));
-      button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
-      button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
-      if (!this.isFocusable(button)) {
-        button.style.setProperty('pointer-events', 'none');
+      trigger.setAttribute('aria-controls', (this.contentElements[i]!.id ||= `accordion-content-${id}`));
+      trigger.setAttribute('id', trigger.getAttribute('id') || `accordion-trigger-${id}`);
+      trigger.setAttribute('tabindex', this.isFocusable(trigger) ? '0' : '-1');
+      if (!this.isFocusable(trigger)) {
+        trigger.style.setProperty('pointer-events', 'none');
       }
-      button.addEventListener('click', this.handleButtonClick);
-      button.addEventListener('keydown', this.handleButtonKeyDown);
+      trigger.addEventListener('click', this.handleTriggerClick);
+      trigger.addEventListener('keydown', this.handleTriggerKeyDown);
     });
     this.contentElements.forEach((content, i) => {
-      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.buttonElements[i]!.getAttribute('id')}`.trim());
+      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i]!.getAttribute('id')}`.trim());
       content.setAttribute('role', 'region');
       content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
@@ -87,30 +87,30 @@ export class Accordion {
     return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
   }
 
-  private toggle(button: HTMLElement, isOpen: boolean, isMatch = false): void {
-    const name = button.getAttribute('data-accordion-name');
+  private toggle(trigger: HTMLElement, isOpen: boolean, isMatch = false): void {
+    const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
-      if (isOpen && opened && opened !== button) {
+      if (isOpen && opened && opened !== trigger) {
         this.close(opened);
       }
     }
-    const section = button.closest(this.settings.selector.section) as HTMLElement;
+    const section = trigger.closest(this.settings.selector.section) as HTMLElement;
     const blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
     window.requestAnimationFrame(() => {
-      button.setAttribute('aria-expanded', String(isOpen));
+      trigger.setAttribute('aria-expanded', String(isOpen));
     });
     section.style.setProperty('overflow', 'clip');
-    const index = this.buttonElements.indexOf(button);
+    const index = this.triggerElements.indexOf(trigger);
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
     }
-    const content = document.getElementById(button.getAttribute('aria-controls')!)!;
+    const content = document.getElementById(trigger.getAttribute('aria-controls')!)!;
     content.removeAttribute('hidden');
     animation = this.animations[index] = section.animate(
       {
-        blockSize: [blockSize, `${parseInt(window.getComputedStyle(button.closest(this.settings.selector.header)!).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
+        blockSize: [blockSize, `${parseInt(window.getComputedStyle(trigger.closest(this.settings.selector.header)!).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
       },
       {
         duration: !isMatch ? this.settings.animation.duration : 0,
@@ -128,13 +128,13 @@ export class Accordion {
     });
   }
 
-  private handleButtonClick(event: MouseEvent): void {
+  private handleTriggerClick(event: MouseEvent): void {
     event.preventDefault();
-    const button = event.currentTarget as HTMLElement;
-    this.toggle(button, button.getAttribute('aria-expanded') !== 'true');
+    const trigger = event.currentTarget as HTMLElement;
+    this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }
 
-  private handleButtonKeyDown(event: KeyboardEvent): void {
+  private handleTriggerKeyDown(event: KeyboardEvent): void {
     const { key } = event;
     if (!['Enter', ' ', 'End', 'Home', 'ArrowUp', 'ArrowDown'].includes(key)) {
       return;
@@ -145,7 +145,7 @@ export class Accordion {
       current.click();
       return;
     }
-    const focusables = this.buttonElements.filter(this.isFocusable);
+    const focusables = this.triggerElements.filter(this.isFocusable);
     const currentIndex = focusables.indexOf(current);
     const length = focusables.length;
     let newIndex: number;
@@ -167,24 +167,24 @@ export class Accordion {
   }
 
   private handleContentBeforeMatch(event: Event): void {
-    const button = document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement;
-    if (button.getAttribute('aria-expanded') === 'true') {
+    const trigger = document.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement;
+    if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.open(button, true);
+    this.open(trigger, true);
   }
 
-  open(button: HTMLElement, isMatch = false): void {
-    if (button.getAttribute('aria-expanded') === 'true') {
+  open(trigger: HTMLElement, isMatch = false): void {
+    if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.toggle(button, true, isMatch);
+    this.toggle(trigger, true, isMatch);
   }
 
-  close(button: HTMLElement): void {
-    if (button.getAttribute('aria-expanded') !== 'true') {
+  close(trigger: HTMLElement): void {
+    if (trigger.getAttribute('aria-expanded') !== 'true') {
       return;
     }
-    this.toggle(button, false);
+    this.toggle(trigger, false);
   }
 }

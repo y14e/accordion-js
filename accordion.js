@@ -5,7 +5,7 @@ export class Accordion {
       selector: {
         section: ':has(> [data-accordion-header])',
         header: '[data-accordion-header]',
-        button: '[data-accordion-button]',
+        trigger: '[data-accordion-trigger]',
         content: '[data-accordion-header] + *',
       },
       animation: {
@@ -29,32 +29,32 @@ export class Accordion {
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
     this.sectionElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`)];
     this.headerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`)];
-    this.buttonElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.button}${NOT_NESTED}`)];
+    this.triggerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`)];
     this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)];
-    if (!this.sectionElements.length || !this.headerElements.length || !this.buttonElements.length || !this.contentElements.length) {
+    if (!this.sectionElements.length || !this.headerElements.length || !this.triggerElements.length || !this.contentElements.length) {
       return;
     }
     this.animations = Array(this.sectionElements.length).fill(null);
-    this.handleButtonClick = this.handleButtonClick.bind(this);
-    this.handleButtonKeyDown = this.handleButtonKeyDown.bind(this);
+    this.handleTriggerClick = this.handleTriggerClick.bind(this);
+    this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
     this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
     this.initialize();
   }
 
   initialize() {
-    this.buttonElements.forEach((button, i) => {
+    this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
-      button.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
-      button.setAttribute('id', button.getAttribute('id') || `accordion-button-${id}`);
-      button.setAttribute('tabindex', this.isFocusable(button) ? '0' : '-1');
-      if (!this.isFocusable(button)) {
-        button.style.setProperty('pointer-events', 'none');
+      trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
+      trigger.setAttribute('id', trigger.getAttribute('id') || `accordion-trigger-${id}`);
+      trigger.setAttribute('tabindex', this.isFocusable(trigger) ? '0' : '-1');
+      if (!this.isFocusable(trigger)) {
+        trigger.style.setProperty('pointer-events', 'none');
       }
-      button.addEventListener('click', this.handleButtonClick);
-      button.addEventListener('keydown', this.handleButtonKeyDown);
+      trigger.addEventListener('click', this.handleTriggerClick);
+      trigger.addEventListener('keydown', this.handleTriggerKeyDown);
     });
     this.contentElements.forEach((content, i) => {
-      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.buttonElements[i].getAttribute('id')}`.trim());
+      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].getAttribute('id')}`.trim());
       content.setAttribute('role', 'region');
       content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
@@ -65,30 +65,30 @@ export class Accordion {
     return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
   }
 
-  toggle(button, isOpen, isMatch = false) {
-    const name = button.getAttribute('data-accordion-name');
+  toggle(trigger, isOpen, isMatch = false) {
+    const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
-      if (isOpen && opened && opened !== button) {
+      if (isOpen && opened && opened !== trigger) {
         this.close(opened);
       }
     }
-    const section = button.closest(this.settings.selector.section);
+    const section = trigger.closest(this.settings.selector.section);
     const blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
     window.requestAnimationFrame(() => {
-      button.setAttribute('aria-expanded', String(isOpen));
+      trigger.setAttribute('aria-expanded', String(isOpen));
     });
     section.style.setProperty('overflow', 'clip');
-    const index = this.buttonElements.indexOf(button);
+    const index = this.triggerElements.indexOf(trigger);
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
     }
-    const content = document.getElementById(button.getAttribute('aria-controls'));
+    const content = document.getElementById(trigger.getAttribute('aria-controls'));
     content.removeAttribute('hidden');
     animation = this.animations[index] = section.animate(
       {
-        blockSize: [blockSize, `${parseInt(window.getComputedStyle(button.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
+        blockSize: [blockSize, `${parseInt(window.getComputedStyle(trigger.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
       },
       {
         duration: !isMatch ? this.settings.animation.duration : 0,
@@ -106,13 +106,13 @@ export class Accordion {
     });
   }
 
-  handleButtonClick(event) {
+  handleTriggerClick(event) {
     event.preventDefault();
-    const button = event.currentTarget;
-    this.toggle(button, button.getAttribute('aria-expanded') !== 'true');
+    const trigger = event.currentTarget;
+    this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
   }
 
-  handleButtonKeyDown(event) {
+  handleTriggerKeyDown(event) {
     const { key } = event;
     if (!['Enter', ' ', 'End', 'Home', 'ArrowUp', 'ArrowDown'].includes(key)) {
       return;
@@ -123,7 +123,7 @@ export class Accordion {
       current.click();
       return;
     }
-    const focusables = this.buttonElements.filter(this.isFocusable);
+    const focusables = this.triggerElements.filter(this.isFocusable);
     const currentIndex = focusables.indexOf(current);
     const length = focusables.length;
     let newIndex;
@@ -145,24 +145,24 @@ export class Accordion {
   }
 
   handleContentBeforeMatch(event) {
-    const button = document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
-    if (button.getAttribute('aria-expanded') === 'true') {
+    const trigger = document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
+    if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.open(button, true);
+    this.open(trigger, true);
   }
 
-  open(button, isMatch = false) {
-    if (button.getAttribute('aria-expanded') === 'true') {
+  open(trigger, isMatch = false) {
+    if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.toggle(button, true, isMatch);
+    this.toggle(trigger, true, isMatch);
   }
 
-  close(button) {
-    if (button.getAttribute('aria-expanded') !== 'true') {
+  close(trigger) {
+    if (trigger.getAttribute('aria-expanded') !== 'true') {
       return;
     }
-    this.toggle(button, false);
+    this.toggle(trigger, false);
   }
 }
