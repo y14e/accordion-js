@@ -34,9 +34,7 @@ export class Accordion {
     if (!this.sectionElements.length || !this.headerElements.length || !this.triggerElements.length || !this.contentElements.length) {
       return;
     }
-    this.handleTriggerClick = this.handleTriggerClick.bind(this);
-    this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
-    this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
+    this.animations = Array(this.sectionElements.length).fill(null);
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
       trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
@@ -45,15 +43,14 @@ export class Accordion {
       if (!this.isFocusable(trigger)) {
         trigger.style.setProperty('pointer-events', 'none');
       }
-      trigger.addEventListener('click', this.handleTriggerClick);
-      trigger.addEventListener('keydown', this.handleTriggerKeyDown);
+      trigger.addEventListener('click', this.handleTriggerClick.bind(this));
+      trigger.addEventListener('keydown', this.handleTriggerKeyDown.bind(this));
     });
     this.contentElements.forEach((content, i) => {
       content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].getAttribute('id')}`.trim());
       content.setAttribute('role', 'region');
-      content.addEventListener('beforematch', this.handleContentBeforeMatch);
+      content.addEventListener('beforematch', this.handleContentBeforeMatch.bind(this));
     });
-    this.animations = Array(this.sectionElements.length).fill(null);
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
 
