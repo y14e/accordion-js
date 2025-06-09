@@ -164,14 +164,14 @@ export class Accordion {
     if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.open(trigger, true);
+    this.toggle(trigger, true, true);
   }
 
-  open(trigger: HTMLElement, isMatch = false): void {
+  open(trigger: HTMLElement): void {
     if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.toggle(trigger, true, isMatch);
+    this.toggle(trigger, true);
   }
 
   close(trigger: HTMLElement): void {

@@ -142,14 +142,14 @@ export class Accordion {
     if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.open(trigger, true);
+    this.toggle(trigger, true, true);
   }
 
-  open(trigger, isMatch = false) {
+  open(trigger) {
     if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
-    this.toggle(trigger, true, isMatch);
+    this.toggle(trigger, true);
   }
 
   close(trigger) {
