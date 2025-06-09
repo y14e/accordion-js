@@ -34,14 +34,6 @@ export class Accordion {
     if (!this.sectionElements.length || !this.headerElements.length || !this.triggerElements.length || !this.contentElements.length) {
       return;
     }
-    this.animations = Array(this.sectionElements.length).fill(null);
-    this.handleTriggerClick = this.handleTriggerClick.bind(this);
-    this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
-    this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
-    this.initialize();
-  }
-
-  initialize() {
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
       trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
@@ -58,6 +50,10 @@ export class Accordion {
       content.setAttribute('role', 'region');
       content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
+    this.animations = Array(this.sectionElements.length).fill(null);
+    this.handleTriggerClick = this.handleTriggerClick.bind(this);
+    this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
+    this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
 
