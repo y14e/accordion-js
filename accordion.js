@@ -31,10 +31,17 @@ export class Accordion {
     this.headerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`)];
     this.triggerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`)];
     this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)];
+    this.animations = Array(this.sectionElements.length).fill(null);
+    this.handleTriggerClick = this.handleTriggerClick.bind(this);
+    this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
+    this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
+    this.initialize();
+  }
+
+  initialize() {
     if (!this.sectionElements.length || !this.headerElements.length || !this.triggerElements.length || !this.contentElements.length) {
       return;
     }
-    this.animations = Array(this.sectionElements.length).fill(null);
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
       trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
@@ -43,13 +50,13 @@ export class Accordion {
       if (!this.isFocusable(trigger)) {
         trigger.style.setProperty('pointer-events', 'none');
       }
-      trigger.addEventListener('click', this.handleTriggerClick.bind(this));
-      trigger.addEventListener('keydown', this.handleTriggerKeyDown.bind(this));
+      trigger.addEventListener('click', this.handleTriggerClick);
+      trigger.addEventListener('keydown', this.handleTriggerKeyDown);
     });
     this.contentElements.forEach((content, i) => {
       content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].getAttribute('id')}`.trim());
       content.setAttribute('role', 'region');
-      content.addEventListener('beforematch', this.handleContentBeforeMatch.bind(this));
+      content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
