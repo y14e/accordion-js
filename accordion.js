@@ -58,18 +58,18 @@ export class Accordion {
     return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
   }
 
-  toggle(trigger, isOpen, isMatch = false) {
+  toggle(trigger, open, match = false) {
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
-      const opened = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
-      if (isOpen && opened && opened !== trigger) {
-        this.close(opened);
+      const current = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
+      if (open && current && current !== trigger) {
+        this.close(current);
       }
     }
     const section = trigger.closest(this.settings.selector.section);
     const blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
     window.requestAnimationFrame(() => {
-      trigger.setAttribute('aria-expanded', String(isOpen));
+      trigger.setAttribute('aria-expanded', String(open));
     });
     section.style.setProperty('overflow', 'clip');
     const index = this.triggerElements.indexOf(trigger);
@@ -81,16 +81,16 @@ export class Accordion {
     content.removeAttribute('hidden');
     animation = this.animations[index] = section.animate(
       {
-        blockSize: [blockSize, `${parseInt(window.getComputedStyle(trigger.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (isOpen ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
+        blockSize: [blockSize, `${parseInt(window.getComputedStyle(trigger.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (open ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
       },
       {
-        duration: !isMatch ? this.settings.animation.duration : 0,
+        duration: !match ? this.settings.animation.duration : 0,
         easing: this.settings.animation.easing,
       },
     );
     animation.addEventListener('finish', () => {
       this.animations[index] = null;
-      if (!isOpen) {
+      if (!open) {
         content.setAttribute('hidden', 'until-found');
       }
       ['block-size', 'overflow'].forEach(name => {
