@@ -66,6 +66,9 @@ export class Accordion {
   }
 
   toggle(trigger, open, match = false) {
+    if ((open && trigger.ariaExpanded === 'true') || (!open && trigger.ariaExpanded === 'false')) {
+      return;
+    }
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const current = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`);
@@ -153,16 +156,10 @@ export class Accordion {
   }
 
   open(trigger) {
-    if (trigger.ariaExpanded === 'true') {
-      return;
-    }
     this.toggle(trigger, true);
   }
 
   close(trigger) {
-    if (trigger.ariaExpanded === 'false') {
-      return;
-    }
     this.toggle(trigger, false);
   }
 }

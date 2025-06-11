@@ -88,6 +88,9 @@ export class Accordion {
   }
 
   private toggle(trigger: HTMLElement, open: boolean, match = false): void {
+    if ((open && trigger.ariaExpanded === 'true') || (!open && trigger.ariaExpanded === 'false')) {
+      return;
+    }
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
       const current = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
@@ -175,16 +178,10 @@ export class Accordion {
   }
 
   open(trigger: HTMLElement): void {
-    if (trigger.ariaExpanded === 'true') {
-      return;
-    }
     this.toggle(trigger, true);
   }
 
   close(trigger: HTMLElement): void {
-    if (trigger.ariaExpanded === 'false') {
-      return;
-    }
     this.toggle(trigger, false);
   }
 }
