@@ -45,8 +45,8 @@ export class Accordion {
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
       trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
-      trigger.setAttribute('id', trigger.getAttribute('id') || `accordion-trigger-${id}`);
-      trigger.setAttribute('tabindex', this.isFocusable(trigger) ? '0' : '-1');
+      trigger.id ||= `accordion-trigger-${id}`;
+      trigger.tabIndex = this.isFocusable(trigger) ? 0 : -1;
       if (!this.isFocusable(trigger)) {
         trigger.style.setProperty('pointer-events', 'none');
       }
@@ -54,15 +54,15 @@ export class Accordion {
       trigger.addEventListener('keydown', this.handleTriggerKeyDown);
     });
     this.contentElements.forEach((content, i) => {
-      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].getAttribute('id')}`.trim());
-      content.setAttribute('role', 'region');
+      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].id}`.trim());
+      content.role = 'region';
       content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
 
   isFocusable(element) {
-    return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
+    return element.ariaDisabled !== 'true' && !element.hasAttribute('disabled');
   }
 
   toggle(trigger, open, match = false) {
@@ -74,9 +74,9 @@ export class Accordion {
       }
     }
     const section = trigger.closest(this.settings.selector.section);
-    const blockSize = window.getComputedStyle(section).getPropertyValue('block-size');
+    const size = window.getComputedStyle(section).getPropertyValue('block-size');
     window.requestAnimationFrame(() => {
-      trigger.setAttribute('aria-expanded', String(open));
+      trigger.ariaExpanded = String(open);
     });
     section.style.setProperty('overflow', 'clip');
     const index = this.triggerElements.indexOf(trigger);
@@ -88,7 +88,7 @@ export class Accordion {
     content.removeAttribute('hidden');
     animation = this.animations[index] = section.animate(
       {
-        blockSize: [blockSize, `${parseInt(window.getComputedStyle(trigger.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (open ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
+        blockSize: [size, `${parseInt(window.getComputedStyle(trigger.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (open ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
       },
       {
         duration: !match ? this.settings.animation.duration : 0,
@@ -109,7 +109,7 @@ export class Accordion {
   handleTriggerClick(event) {
     event.preventDefault();
     const trigger = event.currentTarget;
-    this.toggle(trigger, trigger.getAttribute('aria-expanded') !== 'true');
+    this.toggle(trigger, trigger.ariaExpanded === 'false');
   }
 
   handleTriggerKeyDown(event) {
@@ -145,22 +145,22 @@ export class Accordion {
   }
 
   handleContentBeforeMatch(event) {
-    const trigger = document.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
-    if (trigger.getAttribute('aria-expanded') === 'true') {
+    const trigger = document.querySelector(`[aria-controls="${event.currentTarget.id}"]`);
+    if (trigger.ariaExpanded === 'true') {
       return;
     }
     this.toggle(trigger, true, true);
   }
 
   open(trigger) {
-    if (trigger.getAttribute('aria-expanded') === 'true') {
+    if (trigger.ariaExpanded === 'true') {
       return;
     }
     this.toggle(trigger, true);
   }
 
   close(trigger) {
-    if (trigger.getAttribute('aria-expanded') !== 'true') {
+    if (trigger.ariaExpanded === 'false') {
       return;
     }
     this.toggle(trigger, false);
