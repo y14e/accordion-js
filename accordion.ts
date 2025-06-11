@@ -148,7 +148,7 @@ export class Accordion {
     const focusables = this.triggerElements.filter(this.isFocusable);
     const currentIndex = focusables.indexOf(current);
     const length = focusables.length;
-    let newIndex: number;
+    let newIndex!: number;
     switch (key) {
       case 'End':
         newIndex = length - 1;
@@ -163,7 +163,7 @@ export class Accordion {
         newIndex = (currentIndex + 1) % length;
         break;
     }
-    focusables[newIndex!].focus();
+    focusables[newIndex].focus();
   }
 
   private handleContentBeforeMatch(event: Event): void {
