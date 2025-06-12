@@ -66,7 +66,7 @@ export class Accordion {
   }
 
   toggle(trigger, open, match = false) {
-    if ((open && trigger.ariaExpanded === 'true') || (!open && trigger.ariaExpanded === 'false')) {
+    if (open.toString() === trigger.ariaExpanded) {
       return;
     }
     const name = trigger.getAttribute('data-accordion-name');

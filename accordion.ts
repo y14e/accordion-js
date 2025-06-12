@@ -88,7 +88,7 @@ export class Accordion {
   }
 
   private toggle(trigger: HTMLElement, open: boolean, match = false): void {
-    if ((open && trigger.ariaExpanded === 'true') || (!open && trigger.ariaExpanded === 'false')) {
+    if (open.toString() === trigger.ariaExpanded) {
       return;
     }
     const name = trigger.getAttribute('data-accordion-name');
