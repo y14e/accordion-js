@@ -111,6 +111,7 @@ export class Accordion {
 
   handleTriggerClick(event) {
     event.preventDefault();
+    event.stopPropagation();
     const trigger = event.currentTarget;
     this.toggle(trigger, trigger.ariaExpanded === 'false');
   }
@@ -121,6 +122,7 @@ export class Accordion {
       return;
     }
     event.preventDefault();
+    event.stopPropagation();
     const current = document.activeElement;
     if (['Enter', ' '].includes(key)) {
       current.click();

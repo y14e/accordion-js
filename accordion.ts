@@ -133,6 +133,7 @@ export class Accordion {
 
   private handleTriggerClick(event: MouseEvent): void {
     event.preventDefault();
+    event.stopPropagation();
     const trigger = event.currentTarget as HTMLElement;
     this.toggle(trigger, trigger.ariaExpanded === 'false');
   }
@@ -143,6 +144,7 @@ export class Accordion {
       return;
     }
     event.preventDefault();
+    event.stopPropagation();
     const current = document.activeElement as HTMLElement;
     if (['Enter', ' '].includes(key)) {
       current.click();
