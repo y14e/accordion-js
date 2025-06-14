@@ -1,5 +1,8 @@
 export class Accordion {
   constructor(root, options) {
+    if (!root) {
+      return;
+    }
     this.rootElement = root;
     this.defaults = {
       selector: {
@@ -14,14 +17,8 @@ export class Accordion {
       },
     };
     this.settings = {
-      selector: {
-        ...this.defaults.selector,
-        ...options?.selector,
-      },
-      animation: {
-        ...this.defaults.animation,
-        ...options?.animation,
-      },
+      selector: { ...this.defaults.selector, ...options?.selector },
+      animation: { ...this.defaults.animation, ...options?.animation },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this.settings.animation.duration = 0;
@@ -124,7 +121,11 @@ export class Accordion {
     event.preventDefault();
     event.stopPropagation();
     const focusables = this.triggerElements.filter(this.isFocusable);
-    const current = document.activeElement;
+    const active = document.activeElement;
+    const current = active instanceof HTMLElement ? active : null;
+    if (!current) {
+      return;
+    }
     const currentIndex = focusables.indexOf(current);
     const length = focusables.length;
     let newIndex;
@@ -158,10 +159,16 @@ export class Accordion {
   }
 
   open(trigger) {
+    if (!this.triggerElements.includes(trigger)) {
+      return;
+    }
     this.toggle(trigger, true);
   }
 
   close(trigger) {
+    if (!this.triggerElements.includes(trigger)) {
+      return;
+    }
     this.toggle(trigger, false);
   }
 }

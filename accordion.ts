@@ -22,6 +22,9 @@ export class Accordion {
   private animations!: (Animation | null)[];
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
+    if (!root) {
+      return;
+    }
     this.rootElement = root;
     this.defaults = {
       selector: {
@@ -146,7 +149,11 @@ export class Accordion {
     event.preventDefault();
     event.stopPropagation();
     const focusables = this.triggerElements.filter(this.isFocusable);
-    const current = document.activeElement as HTMLElement;
+    const active = document.activeElement;
+    const current = active instanceof HTMLElement ? active : null;
+    if (!current) {
+      return;
+    }
     const currentIndex = focusables.indexOf(current);
     const length = focusables.length;
     let newIndex!: number;
@@ -180,10 +187,16 @@ export class Accordion {
   }
 
   open(trigger: HTMLElement): void {
+    if (!this.triggerElements.includes(trigger)) {
+      return;
+    }
     this.toggle(trigger, true);
   }
 
   close(trigger: HTMLElement): void {
+    if (!this.triggerElements.includes(trigger)) {
+      return;
+    }
     this.toggle(trigger, false);
   }
 }
