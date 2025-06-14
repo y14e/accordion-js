@@ -122,9 +122,7 @@ export class Accordion {
       if (!open) {
         content.setAttribute('hidden', 'until-found');
       }
-      ['block-size', 'overflow'].forEach(name => {
-        section.style.removeProperty(name);
-      });
+      ['block-size', 'overflow'].forEach(name => section.style.removeProperty(name));
     });
   }
 
