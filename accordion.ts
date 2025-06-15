@@ -12,13 +12,13 @@ type AccordionOptions = {
 };
 
 export class Accordion {
-  private rootElement: HTMLElement;
-  private defaults: AccordionOptions;
-  private settings: AccordionOptions;
-  private sectionElements: HTMLElement[];
-  private headerElements: HTMLElement[];
-  private triggerElements: HTMLElement[];
-  private contentElements: HTMLElement[];
+  private rootElement!: HTMLElement;
+  private defaults!: AccordionOptions;
+  private settings!: AccordionOptions;
+  private sectionElements!: HTMLElement[];
+  private headerElements!: HTMLElement[];
+  private triggerElements!: HTMLElement[];
+  private contentElements!: HTMLElement[];
   private animations!: (Animation | null)[];
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
