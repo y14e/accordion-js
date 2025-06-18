@@ -42,6 +42,9 @@ export class Accordion {
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
       trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
+      if (!trigger.ariaExpanded) {
+        trigger.ariaExpanded = 'false';
+      }
       trigger.id ||= `accordion-trigger-${id}`;
       trigger.tabIndex = this.isFocusable(trigger) ? 0 : -1;
       if (!this.isFocusable(trigger)) {
