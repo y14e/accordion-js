@@ -61,6 +61,14 @@ export class Accordion {
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
 
+  getActiveElement() {
+    let active = document.activeElement;
+    while (active instanceof HTMLElement && active.shadowRoot?.activeElement) {
+      active = active.shadowRoot.activeElement;
+    }
+    return active instanceof HTMLElement ? active : null;
+  }
+
   isFocusable(element) {
     return element.ariaDisabled !== 'true' && !element.hasAttribute('disabled');
   }
@@ -122,7 +130,7 @@ export class Accordion {
     event.preventDefault();
     event.stopPropagation();
     const focusables = this.triggerElements.filter(this.isFocusable);
-    const active = document.activeElement;
+    const active = this.getActiveElement();
     const current = active instanceof HTMLElement ? active : null;
     if (!current) {
       return;
