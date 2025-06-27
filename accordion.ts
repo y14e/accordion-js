@@ -101,7 +101,7 @@ export class Accordion {
     }
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
-      const current = document.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
+      const current = this.rootElement.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
       if (open && current && current !== trigger) {
         this.close(current);
       }
@@ -117,7 +117,7 @@ export class Accordion {
     if (animation) {
       animation.cancel();
     }
-    const content = document.getElementById(trigger.getAttribute('aria-controls')!)!;
+    const content = this.rootElement.querySelector(`#${trigger.getAttribute('aria-controls')}`)!;
     content.removeAttribute('hidden');
     animation = this.animations[index] = section.animate(
       {
