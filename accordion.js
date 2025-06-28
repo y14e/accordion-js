@@ -6,10 +6,8 @@ export class Accordion {
     this.rootElement = root;
     this.defaults = {
       selector: {
-        section: ':has(> [data-accordion-header])',
-        header: '[data-accordion-header]',
         trigger: '[data-accordion-trigger]',
-        content: '[data-accordion-header] + *',
+        content: ':has(> [data-accordion-trigger]) + *',
       },
       animation: {
         duration: 300,
@@ -24,11 +22,9 @@ export class Accordion {
       this.settings.animation.duration = 0;
     }
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
-    this.sectionElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.section}${NOT_NESTED}`)];
-    this.headerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.header}${NOT_NESTED}`)];
     this.triggerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`)];
     this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)];
-    this.animations = Array(this.sectionElements.length).fill(null);
+    this.animations = Array(this.triggerElements.length).fill(null);
     this.handleTriggerClick = this.handleTriggerClick.bind(this);
     this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
     this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
@@ -36,7 +32,7 @@ export class Accordion {
   }
 
   initialize() {
-    if (!this.sectionElements.length || !this.headerElements.length || !this.triggerElements.length || !this.contentElements.length) {
+    if (!this.triggerElements.length || !this.contentElements.length) {
       return;
     }
     this.triggerElements.forEach((trigger, i) => {
@@ -84,22 +80,22 @@ export class Accordion {
         this.close(current);
       }
     }
-    const section = trigger.closest(this.settings.selector.section);
-    const size = window.getComputedStyle(section).getPropertyValue('block-size');
     window.requestAnimationFrame(() => {
       trigger.ariaExpanded = String(open);
     });
-    section.style.setProperty('overflow', 'clip');
+    trigger.ariaLabel = trigger.getAttribute(`data-accordion-${open ? 'expanded' : 'collapsed'}-label`) ?? trigger.ariaLabel;
     const index = this.triggerElements.indexOf(trigger);
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
     }
     const content = this.rootElement.querySelector(`#${trigger.getAttribute('aria-controls')}`);
+    const size = `${parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) || 0}px`;
     content.removeAttribute('hidden');
-    animation = this.animations[index] = section.animate(
+    content.style.setProperty('overflow', 'clip');
+    animation = this.animations[index] = content.animate(
       {
-        blockSize: [size, `${parseInt(window.getComputedStyle(trigger.closest(this.settings.selector.header)).getPropertyValue('block-size')) + (open ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0)}px`],
+        blockSize: [size, `${open ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0}px`],
       },
       {
         duration: !match ? this.settings.animation.duration : 0,
@@ -111,7 +107,7 @@ export class Accordion {
       if (!open) {
         content.setAttribute('hidden', 'until-found');
       }
-      ['block-size', 'overflow'].forEach(name => section.style.removeProperty(name));
+      ['block-size', 'overflow'].forEach(name => content.style.removeProperty(name));
     });
   }
 
