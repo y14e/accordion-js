@@ -110,9 +110,8 @@ export class Accordion {
       this.animations[index] = null;
       if (!open) {
         content.setAttribute('hidden', 'until-found');
-        content.style.setProperty('display', 'none');
       }
-      ['block-size', 'overflow'].forEach(name => content.style.removeProperty(name));
+      ['block-size', 'display', 'overflow'].forEach(name => content.style.removeProperty(name));
     });
   }
 
