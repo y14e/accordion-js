@@ -84,13 +84,17 @@ export class Accordion {
       trigger.ariaExpanded = String(open);
     });
     trigger.ariaLabel = trigger.getAttribute(`data-accordion-${open ? 'expanded' : 'collapsed'}-label`) ?? trigger.ariaLabel;
+    const content = this.rootElement.querySelector(`#${trigger.getAttribute('aria-controls')}`);
+    const computed = window.getComputedStyle(content);
+    const size = `${parseInt(computed.getPropertyValue('block-size')) || 0}px`;
     const index = this.triggerElements.indexOf(trigger);
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
     }
-    const content = this.rootElement.querySelector(`#${trigger.getAttribute('aria-controls')}`);
-    const size = `${parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) || 0}px`;
+    if (computed.getPropertyValue('display') === 'none') {
+      content.style.setProperty('display', 'block');
+    }
     content.removeAttribute('hidden');
     content.style.setProperty('overflow', 'clip');
     animation = this.animations[index] = content.animate(
@@ -106,6 +110,7 @@ export class Accordion {
       this.animations[index] = null;
       if (!open) {
         content.setAttribute('hidden', 'until-found');
+        content.style.setProperty('display', 'none');
       }
       ['block-size', 'overflow'].forEach(name => content.style.removeProperty(name));
     });
