@@ -1,11 +1,11 @@
 type AccordionOptions = {
+  selector: {
+    trigger: string;
+    content: string;
+  };
   animation: {
     duration: number;
     easing: string;
-  };
-  selector: {
-    content: string;
-    trigger: string;
   };
 };
 
@@ -23,18 +23,18 @@ export class Accordion {
     }
     this.rootElement = root;
     this.defaults = {
+      selector: {
+        trigger: '[data-accordion-trigger]',
+        content: ':has(> [data-accordion-trigger]) + *',
+      },
       animation: {
         duration: 300,
         easing: 'ease',
       },
-      selector: {
-        content: ':has(> [data-accordion-trigger]) + *',
-        trigger: '[data-accordion-trigger]',
-      },
     };
     this.settings = {
-      animation: { ...this.defaults.animation, ...options?.animation },
       selector: { ...this.defaults.selector, ...options?.selector },
+      animation: { ...this.defaults.animation, ...options?.animation },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this.settings.animation.duration = 0;
