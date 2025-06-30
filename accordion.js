@@ -5,18 +5,18 @@ export class Accordion {
     }
     this.rootElement = root;
     this.defaults = {
-      selector: {
-        trigger: '[data-accordion-trigger]',
-        content: ':has(> [data-accordion-trigger]) + *',
-      },
       animation: {
         duration: 300,
         easing: 'ease',
       },
+      selector: {
+        content: ':has(> [data-accordion-trigger]) + *',
+        trigger: '[data-accordion-trigger]',
+      },
     };
     this.settings = {
-      selector: { ...this.defaults.selector, ...options?.selector },
       animation: { ...this.defaults.animation, ...options?.animation },
+      selector: { ...this.defaults.selector, ...options?.selector },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this.settings.animation.duration = 0;
