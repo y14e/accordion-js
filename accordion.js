@@ -5,18 +5,18 @@ export class Accordion {
     }
     this.rootElement = root;
     this.defaults = {
-      selector: {
-        trigger: '[data-accordion-trigger]',
-        content: ':has(> [data-accordion-trigger]) + *',
-      },
       animation: {
         duration: 300,
         easing: 'ease',
       },
+      selector: {
+        content: ':has(> [data-accordion-trigger]) + *',
+        trigger: '[data-accordion-trigger]',
+      },
     };
     this.settings = {
-      selector: { ...this.defaults.selector, ...options?.selector },
       animation: { ...this.defaults.animation, ...options?.animation },
+      selector: { ...this.defaults.selector, ...options?.selector },
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this.settings.animation.duration = 0;
@@ -37,12 +37,15 @@ export class Accordion {
     }
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
-      trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
-      if (!trigger.ariaExpanded) {
-        trigger.ariaExpanded = 'false';
+      const content = this.contentElements[i];
+      const contentId = content.getAttribute('id') || `accordion-content-${id}`;
+      content.setAttribute('id', contentId);
+      trigger.setAttribute('aria-controls', contentId);
+      if (!trigger.hasAttribute('aria-expanded')) {
+        trigger.setAttribute('aria-expanded', 'false');
       }
-      trigger.id ||= `accordion-trigger-${id}`;
-      trigger.tabIndex = this.isFocusable(trigger) ? 0 : -1;
+      trigger.setAttribute('id', trigger.getAttribute('id') || `accordion-trigger-${id}`);
+      trigger.setAttribute('tabindex', String(this.isFocusable(trigger) ? 0 : -1));
       if (!this.isFocusable(trigger)) {
         trigger.style.setProperty('pointer-events', 'none');
       }
@@ -50,8 +53,8 @@ export class Accordion {
       trigger.addEventListener('keydown', this.handleTriggerKeyDown);
     });
     this.contentElements.forEach((content, i) => {
-      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].id}`.trim());
-      content.role = 'region';
+      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].getAttribute('id')}`.trim());
+      content.setAttribute('role', 'region');
       content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
     this.rootElement.setAttribute('data-accordion-initialized', '');
@@ -66,11 +69,11 @@ export class Accordion {
   }
 
   isFocusable(element) {
-    return element.ariaDisabled !== 'true' && !element.hasAttribute('disabled');
+    return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
   }
 
   toggle(trigger, open, match = false) {
-    if (open.toString() === trigger.ariaExpanded) {
+    if (open.toString() === trigger.getAttribute('aria-expanded')) {
       return;
     }
     const name = trigger.getAttribute('data-accordion-name');
@@ -80,26 +83,23 @@ export class Accordion {
         this.close(current);
       }
     }
-    window.requestAnimationFrame(() => {
-      trigger.ariaExpanded = String(open);
-    });
-    trigger.ariaLabel = trigger.getAttribute(`data-accordion-${open ? 'expanded' : 'collapsed'}-label`) ?? trigger.ariaLabel;
-    const content = this.rootElement.querySelector(`#${trigger.getAttribute('aria-controls')}`);
-    const computed = window.getComputedStyle(content);
-    const size = `${parseInt(computed.getPropertyValue('block-size')) || 0}px`;
+    trigger.setAttribute('aria-label', trigger.getAttribute(`data-accordion-${open ? 'expanded' : 'collapsed'}-label`) ?? (trigger.getAttribute('aria-label') || ''));
     const index = this.triggerElements.indexOf(trigger);
+    const content = this.contentElements[index];
+    const computed = window.getComputedStyle(content);
+    const size = !content.hasAttribute('hidden') ? computed.getPropertyValue('block-size') : '0';
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
     }
-    if (computed.getPropertyValue('display') === 'none') {
-      content.style.setProperty('display', 'block');
-    }
     content.removeAttribute('hidden');
+    window.requestAnimationFrame(() => {
+      trigger.setAttribute('aria-expanded', String(open));
+    });
     content.style.setProperty('overflow', 'clip');
     animation = this.animations[index] = content.animate(
       {
-        blockSize: [size, `${open ? parseInt(window.getComputedStyle(content).getPropertyValue('block-size')) : 0}px`],
+        blockSize: [size, open ? computed.getPropertyValue('block-size') : '0'],
       },
       {
         duration: !match ? this.settings.animation.duration : 0,
@@ -111,7 +111,7 @@ export class Accordion {
       if (!open) {
         content.setAttribute('hidden', 'until-found');
       }
-      ['block-size', 'display', 'overflow'].forEach(name => content.style.removeProperty(name));
+      ['block-size', 'overflow'].forEach(name => content.style.removeProperty(name));
     });
   }
 
@@ -119,7 +119,7 @@ export class Accordion {
     event.preventDefault();
     event.stopPropagation();
     const trigger = event.currentTarget;
-    this.toggle(trigger, trigger.ariaExpanded === 'false');
+    this.toggle(trigger, trigger.getAttribute('aria-expanded') === 'false');
   }
 
   handleTriggerKeyDown(event) {
@@ -160,8 +160,8 @@ export class Accordion {
   }
 
   handleContentBeforeMatch(event) {
-    const trigger = this.rootElement.querySelector(`[aria-controls="${event.currentTarget.id}"]`);
-    if (trigger.ariaExpanded === 'true') {
+    const trigger = this.rootElement.querySelector(`[aria-controls="${event.currentTarget.getAttribute('id')}"]`);
+    if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
     this.toggle(trigger, true, true);
