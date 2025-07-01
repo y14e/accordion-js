@@ -63,7 +63,7 @@ export class Accordion {
         trigger.setAttribute('aria-expanded', 'false');
       }
       trigger.setAttribute('id', trigger.getAttribute('id') || `accordion-trigger-${id}`);
-      trigger.setAttribute('tabindex', String(this.isFocusable(trigger) ? 0 : -1));
+      trigger.setAttribute('tabindex', this.isFocusable(trigger) ? '0' : '-1');
       if (!this.isFocusable(trigger)) {
         trigger.style.setProperty('pointer-events', 'none');
       }
@@ -98,7 +98,7 @@ export class Accordion {
     if (name) {
       const current = this.rootElement.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
       if (open && current && current !== trigger) {
-        this.close(current);
+        this.toggle(current, false, match);
       }
     }
     trigger.setAttribute('aria-label', trigger.getAttribute(`data-accordion-${open ? 'expanded' : 'collapsed'}-label`) ?? (trigger.getAttribute('aria-label') || ''));
@@ -178,7 +178,7 @@ export class Accordion {
   }
 
   private handleContentBeforeMatch(event: Event): void {
-    const trigger = this.rootElement.querySelector(`[aria-controls="${(event.currentTarget as HTMLElement).getAttribute('id')}"]`) as HTMLElement;
+    const trigger = this.triggerElements[this.contentElements.indexOf(event.currentTarget as HTMLElement)];
     if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
