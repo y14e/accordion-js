@@ -66,7 +66,7 @@ export class Accordion {
   }
 
   isFocusable(element) {
-    return element.getAttribute('aria-disabled') !== 'true' && !element.disabled;
+    return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
   }
 
   toggle(trigger, open, match = false) {

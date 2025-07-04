@@ -84,7 +84,7 @@ export class Accordion {
   }
 
   private isFocusable(element: HTMLElement): boolean {
-    return element.getAttribute('aria-disabled') !== 'true' && !element.disabled;
+    return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
   }
 
   private toggle(trigger: HTMLElement, open: boolean, match = false): void {
