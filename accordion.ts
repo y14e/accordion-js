@@ -84,7 +84,7 @@ export class Accordion {
   }
 
   private isFocusable(element: HTMLElement): boolean {
-    return element.getAttribute('aria-disabled') !== 'true' && !element.hasAttribute('disabled');
+    return element.getAttribute('aria-disabled') !== 'true' && !element.disabled;
   }
 
   private toggle(trigger: HTMLElement, open: boolean, match = false): void {
@@ -102,12 +102,12 @@ export class Accordion {
     const index = this.triggerElements.indexOf(trigger);
     const content = this.contentElements[index];
     const computed = window.getComputedStyle(content);
-    const size = !content.hasAttribute('hidden') ? computed.getPropertyValue('block-size') : '0';
+    const size = !content.hidden ? computed.getPropertyValue('block-size') : '0';
     let animation = this.animations[index];
     if (animation) {
       animation.cancel();
     }
-    content.removeAttribute('hidden');
+    content.hidden = false;
     window.requestAnimationFrame(() => {
       trigger.setAttribute('aria-expanded', String(open));
     });
