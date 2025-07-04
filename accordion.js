@@ -37,14 +37,11 @@ export class Accordion {
     }
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
-      const content = this.contentElements[i];
-      const contentId = content.getAttribute('id') || `accordion-content-${id}`;
-      content.setAttribute('id', contentId);
-      trigger.setAttribute('aria-controls', contentId);
+      trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
       if (!trigger.hasAttribute('aria-expanded')) {
         trigger.setAttribute('aria-expanded', 'false');
       }
-      trigger.setAttribute('id', trigger.getAttribute('id') || `accordion-trigger-${id}`);
+      trigger.id ||= `accordion-trigger-${id}`;
       trigger.setAttribute('tabindex', this.isFocusable(trigger) ? '0' : '-1');
       if (!this.isFocusable(trigger)) {
         trigger.style.setProperty('pointer-events', 'none');
@@ -53,7 +50,7 @@ export class Accordion {
       trigger.addEventListener('keydown', this.handleTriggerKeyDown);
     });
     this.contentElements.forEach((content, i) => {
-      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].getAttribute('id')}`.trim());
+      content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].id}`.trim());
       content.setAttribute('role', 'region');
       content.addEventListener('beforematch', this.handleContentBeforeMatch);
     });
