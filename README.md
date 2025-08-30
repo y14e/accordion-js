@@ -2,7 +2,7 @@
 WAI-ARIA compliant accordion pattern implementation in JS.
 ## Installation
 ```js
-import { Accordion } from './accordion.js';
+import Accordion from './accordion.js';
 
 const myAccordion = new Accordion(...);
 ```
