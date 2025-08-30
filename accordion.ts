@@ -9,7 +9,7 @@ type AccordionOptions = {
   };
 };
 
-export class Accordion {
+export default class Accordion {
   private rootElement!: HTMLElement;
   private defaults!: AccordionOptions;
   private settings!: AccordionOptions;

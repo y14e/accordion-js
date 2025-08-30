@@ -1,4 +1,4 @@
-export class Accordion {
+export default class Accordion {
   constructor(root, options) {
     if (!root) {
       return;
