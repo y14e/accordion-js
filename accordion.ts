@@ -16,6 +16,8 @@ export default class Accordion {
   private triggerElements!: HTMLElement[];
   private contentElements!: HTMLElement[];
   private animations!: (Animation | null)[];
+  private eventController!: AbortController;
+  private destroyed!: boolean;
 
   constructor(root: HTMLElement, options?: Partial<AccordionOptions>) {
     if (!root) {
@@ -43,6 +45,8 @@ export default class Accordion {
     this.triggerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`)] as HTMLElement[];
     this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)] as HTMLElement[];
     this.animations = Array(this.triggerElements.length).fill(null);
+    this.eventController = new AbortController();
+    this.destroyed = false;
     this.handleTriggerClick = this.handleTriggerClick.bind(this);
     this.handleTriggerKeyDown = this.handleTriggerKeyDown.bind(this);
     this.handleContentBeforeMatch = this.handleContentBeforeMatch.bind(this);
@@ -53,6 +57,7 @@ export default class Accordion {
     if (!this.triggerElements.length || !this.contentElements.length) {
       return;
     }
+    const { signal } = this.eventController;
     this.triggerElements.forEach((trigger, i) => {
       const id = Math.random().toString(36).slice(-8);
       trigger.setAttribute('aria-controls', (this.contentElements[i].id ||= `accordion-content-${id}`));
@@ -64,13 +69,13 @@ export default class Accordion {
       if (!this.isFocusable(trigger)) {
         trigger.style.setProperty('pointer-events', 'none');
       }
-      trigger.addEventListener('click', this.handleTriggerClick);
-      trigger.addEventListener('keydown', this.handleTriggerKeyDown);
+      trigger.addEventListener('click', this.handleTriggerClick, { signal });
+      trigger.addEventListener('keydown', this.handleTriggerKeyDown, { signal });
     });
     this.contentElements.forEach((content, i) => {
       content.setAttribute('aria-labelledby', `${content.getAttribute('aria-labelledby') || ''} ${this.triggerElements[i].id}`.trim());
       content.setAttribute('role', 'region');
-      content.addEventListener('beforematch', this.handleContentBeforeMatch);
+      content.addEventListener('beforematch', this.handleContentBeforeMatch, { signal });
     });
     this.rootElement.setAttribute('data-accordion-initialized', '');
   }
@@ -104,9 +109,7 @@ export default class Accordion {
     const computed = window.getComputedStyle(content);
     const fromSize = !content.hidden ? computed.getPropertyValue('block-size') : '0';
     let animation = this.animations[index];
-    if (animation) {
-      animation.cancel();
-    }
+    animation?.cancel();
     content.hidden = false;
     const toSize = open ? parseFloat(computed.getPropertyValue('block-size')) : 0;
     window.requestAnimationFrame(() => {
@@ -195,5 +198,16 @@ export default class Accordion {
       return;
     }
     this.toggle(trigger, false);
+  }
+
+  destroy() {
+    if (this.destroyed) {
+      return;
+    }
+    this.rootElement.removeAttribute('data-accordion-initialized');
+    this.animations.forEach(animation => animation?.cancel());
+    this.animations = [];
+    this.eventController.abort();
+    this.destroyed = true;
   }
 }
