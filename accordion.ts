@@ -205,8 +205,6 @@ export default class Accordion {
       return;
     }
     this.rootElement.removeAttribute('data-accordion-initialized');
-    this.animations.forEach(animation => animation?.cancel());
-    this.animations = [];
     this.eventController.abort();
     this.destroyed = true;
   }
