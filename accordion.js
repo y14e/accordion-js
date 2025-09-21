@@ -139,7 +139,7 @@ export default class Accordion {
     }
     const currentIndex = focusables.indexOf(current);
     const length = focusables.length;
-    let newIndex;
+    let newIndex = currentIndex;
     switch (key) {
       case 'Enter':
       case ' ':
