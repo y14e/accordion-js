@@ -119,7 +119,7 @@ export default class Accordion {
     event.stopPropagation();
     const trigger = event.currentTarget;
     if (!(trigger instanceof HTMLElement)) {
-      return;
+      throw new TypeError();
     }
     this.toggle(trigger, trigger.getAttribute('aria-expanded') === 'false');
   }
@@ -164,7 +164,7 @@ export default class Accordion {
   handleContentBeforeMatch(event) {
     const content = event.currentTarget;
     if (!(content instanceof HTMLElement)) {
-      return;
+      throw new TypeError();
     }
     const trigger = this.triggerElements[this.contentElements.indexOf(content)];
     if (trigger.getAttribute('aria-expanded') === 'true') {
