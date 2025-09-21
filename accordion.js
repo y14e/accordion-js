@@ -62,7 +62,7 @@ export default class Accordion {
 
   getActiveElement() {
     let active = document.activeElement;
-    while (active instanceof HTMLElement && active.shadowRoot?.activeElement) {
+    while (active && active.shadowRoot?.activeElement) {
       active = active.shadowRoot.activeElement;
     }
     return active instanceof HTMLElement ? active : null;
@@ -118,6 +118,9 @@ export default class Accordion {
     event.preventDefault();
     event.stopPropagation();
     const trigger = event.currentTarget;
+    if (!(trigger instanceof HTMLElement)) {
+      return;
+    }
     this.toggle(trigger, trigger.getAttribute('aria-expanded') === 'false');
   }
 
@@ -159,7 +162,11 @@ export default class Accordion {
   }
 
   handleContentBeforeMatch(event) {
-    const trigger = this.triggerElements[this.contentElements.indexOf(event.currentTarget)];
+    const content = event.currentTarget;
+    if (!(content instanceof HTMLElement)) {
+      return;
+    }
+    const trigger = this.triggerElements[this.contentElements.indexOf(content)];
     if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }

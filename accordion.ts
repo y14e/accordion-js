@@ -42,8 +42,8 @@ export default class Accordion {
       this.settings.animation.duration = 0;
     }
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
-    this.triggerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`)] as HTMLElement[];
-    this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)] as HTMLElement[];
+    this.triggerElements = [...this.rootElement.querySelectorAll<HTMLElement>(`${this.settings.selector.trigger}${NOT_NESTED}`)];
+    this.contentElements = [...this.rootElement.querySelectorAll<HTMLElement>(`${this.settings.selector.content}${NOT_NESTED}`)];
     this.animations = Array(this.triggerElements.length).fill(null);
     this.eventController = new AbortController();
     this.destroyed = false;
@@ -82,7 +82,7 @@ export default class Accordion {
 
   private getActiveElement(): HTMLElement | null {
     let active: Element | null = document.activeElement;
-    while (active instanceof HTMLElement && active.shadowRoot?.activeElement) {
+    while (active && active.shadowRoot?.activeElement) {
       active = active.shadowRoot.activeElement;
     }
     return active instanceof HTMLElement ? active : null;
@@ -98,7 +98,7 @@ export default class Accordion {
     }
     const name = trigger.getAttribute('data-accordion-name');
     if (name) {
-      const current = this.rootElement.querySelector(`[aria-expanded="true"][data-accordion-name="${name}"]`) as HTMLElement;
+      const current = this.rootElement.querySelector<HTMLElement>(`[aria-expanded="true"][data-accordion-name="${name}"]`);
       if (open && current && current !== trigger) {
         this.toggle(current, false, match);
       }
@@ -137,7 +137,10 @@ export default class Accordion {
   private handleTriggerClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    const trigger = event.currentTarget as HTMLElement;
+    const trigger = event.currentTarget;
+    if (!(trigger instanceof HTMLElement)) {
+      return;
+    }
     this.toggle(trigger, trigger.getAttribute('aria-expanded') === 'false');
   }
 
@@ -179,7 +182,11 @@ export default class Accordion {
   }
 
   private handleContentBeforeMatch(event: Event): void {
-    const trigger = this.triggerElements[this.contentElements.indexOf(event.currentTarget as HTMLElement)];
+    const content = event.currentTarget;
+    if (!(content instanceof HTMLElement)) {
+      return;
+    }
+    const trigger = this.triggerElements[this.contentElements.indexOf(content)];
     if (trigger.getAttribute('aria-expanded') === 'true') {
       return;
     }
