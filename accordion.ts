@@ -85,7 +85,7 @@ export default class Accordion {
     while (active && active.shadowRoot?.activeElement) {
       active = active.shadowRoot.activeElement;
     }
-    return active instanceof HTMLElement ? active : null;
+    return active as HTMLElement | null;
   }
 
   private isFocusable(element: HTMLElement): boolean {
@@ -137,10 +137,7 @@ export default class Accordion {
   private handleTriggerClick(event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    const trigger = event.currentTarget;
-    if (!(trigger instanceof HTMLElement)) {
-      throw new TypeError();
-    }
+    const trigger = event.currentTarget as HTMLElement;
     this.toggle(trigger, trigger.getAttribute('aria-expanded') === 'false');
   }
 
@@ -152,18 +149,14 @@ export default class Accordion {
     event.preventDefault();
     event.stopPropagation();
     const focusables = this.triggerElements.filter(this.isFocusable);
-    const active = this.getActiveElement();
-    const current = active instanceof HTMLElement ? active : null;
-    if (!current) {
-      return;
-    }
-    const currentIndex = focusables.indexOf(current);
+    const active = this.getActiveElement()!;
+    const currentIndex = focusables.indexOf(active);
     const length = focusables.length;
     let newIndex = currentIndex;
     switch (key) {
       case 'Enter':
       case ' ':
-        current.click();
+        active.click();
         return;
       case 'End':
         newIndex = length - 1;
@@ -182,29 +175,22 @@ export default class Accordion {
   }
 
   private handleContentBeforeMatch(event: Event): void {
-    const content = event.currentTarget;
-    if (!(content instanceof HTMLElement)) {
-      throw new TypeError();
+    const trigger = this.triggerElements[this.contentElements.indexOf(event.currentTarget as HTMLElement)];
+    if (trigger.getAttribute('aria-expanded') === 'false') {
+      this.toggle(trigger, true, true);
     }
-    const trigger = this.triggerElements[this.contentElements.indexOf(content)];
-    if (trigger.getAttribute('aria-expanded') === 'true') {
-      return;
-    }
-    this.toggle(trigger, true, true);
   }
 
   open(trigger: HTMLElement): void {
-    if (!this.triggerElements.includes(trigger)) {
-      return;
+    if (this.triggerElements.includes(trigger)) {
+      this.toggle(trigger, true);
     }
-    this.toggle(trigger, true);
   }
 
   close(trigger: HTMLElement): void {
-    if (!this.triggerElements.includes(trigger)) {
-      return;
+    if (this.triggerElements.includes(trigger)) {
+      this.toggle(trigger, false);
     }
-    this.toggle(trigger, false);
   }
 
   destroy() {
