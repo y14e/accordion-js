@@ -81,7 +81,7 @@ export default class Accordion {
   }
 
   private getActiveElement(): HTMLElement | null {
-    let active: Element | null = document.activeElement;
+    let active = document.activeElement;
     while (active && active.shadowRoot?.activeElement) {
       active = active.shadowRoot.activeElement;
     }
