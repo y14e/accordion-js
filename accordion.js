@@ -97,9 +97,7 @@ export default class Accordion {
     });
     content.style.setProperty('overflow', 'clip');
     animation = this.animations[index] = content.animate(
-      {
-        blockSize: [fromSize, `${Math.max(parseFloat(computed.getPropertyValue('min-block-size')), Math.min(toSize, parseFloat(computed.getPropertyValue('max-block-size')) || toSize))}px`],
-      },
+      { blockSize: [fromSize, `${Math.max(parseFloat(computed.getPropertyValue('min-block-size')), Math.min(toSize, parseFloat(computed.getPropertyValue('max-block-size')) || toSize))}px`] },
       {
         duration: !match ? this.settings.animation.duration : 0,
         easing: this.settings.animation.easing,
