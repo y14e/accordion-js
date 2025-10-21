@@ -1,4 +1,4 @@
-type AccordionOptions = {
+interface AccordionOptions {
   animation: {
     duration: number;
     easing: string;
@@ -7,7 +7,7 @@ type AccordionOptions = {
     content: string;
     trigger: string;
   };
-};
+}
 
 export default class Accordion {
   private rootElement!: HTMLElement;
