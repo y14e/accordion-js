@@ -71,15 +71,15 @@ export default class Accordion {
     const index = this.triggerElements.indexOf(trigger);
     const content = this.contentElements[index];
     const computed = window.getComputedStyle(content);
-    const startSize = !content.hidden ? computed.getPropertyValue('block-size') : '0';
+    const start = !content.hidden ? computed.getPropertyValue('block-size') : '0';
     let animation = this.animations[index];
     animation?.cancel();
     content.hidden = false;
-    const endSize = open ? parseFloat(computed.getPropertyValue('block-size')) : 0;
+    const end = open ? parseFloat(computed.getPropertyValue('block-size')) : 0;
     window.requestAnimationFrame(() => trigger.setAttribute('aria-expanded', String(open)));
     content.style.setProperty('overflow', 'clip');
     animation = this.animations[index] = content.animate(
-      { blockSize: [startSize, `${Math.max(parseFloat(computed.getPropertyValue('min-block-size')), Math.min(endSize, parseFloat(computed.getPropertyValue('max-block-size')) || endSize))}px`] },
+      { blockSize: [start, `${Math.max(parseFloat(computed.getPropertyValue('min-block-size')), Math.min(end, parseFloat(computed.getPropertyValue('max-block-size')) || end))}px`] },
       {
         duration: !match ? this.settings.animation.duration : 0,
         easing: this.settings.animation.easing,
