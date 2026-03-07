@@ -88,7 +88,7 @@ export default class Accordion {
     animation.addEventListener('finish', () => {
       this.animations[index] = null;
       if (!open) content.setAttribute('hidden', 'until-found');
-      ['block-size', 'overflow'].forEach(name => content.style.removeProperty(name));
+      ['block-size', 'overflow'].forEach((name) => content.style.removeProperty(name));
     });
   }
 
