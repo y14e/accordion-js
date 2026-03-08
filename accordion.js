@@ -18,7 +18,9 @@ export default class Accordion {
       animation: { ...this.defaults.animation, ...options?.animation },
       selector: { ...this.defaults.selector, ...options?.selector },
     };
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.settings.animation.duration = 0;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.settings.animation.duration = 0;
+    }
     const NOT_NESTED = `:not(:scope ${this.settings.selector.content} *)`;
     this.triggerElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.trigger}${NOT_NESTED}`)];
     this.contentElements = [...this.rootElement.querySelectorAll(`${this.settings.selector.content}${NOT_NESTED}`)];
