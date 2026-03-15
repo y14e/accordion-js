@@ -112,7 +112,7 @@ export default class Accordion {
     animation?.cancel();
     content.hidden = false;
     const end = open ? parseFloat(computed.getPropertyValue('block-size')) : 0;
-    window.requestAnimationFrame(() => trigger.setAttribute('aria-expanded', String(open)));
+    requestAnimationFrame(() => trigger.setAttribute('aria-expanded', String(open)));
     content.style.setProperty('overflow', 'clip');
     animation = this.animations[index] = content.animate(
       { blockSize: [start, `${Math.max(parseFloat(computed.getPropertyValue('min-block-size')), Math.min(end, parseFloat(computed.getPropertyValue('max-block-size')) || end))}px`] },
