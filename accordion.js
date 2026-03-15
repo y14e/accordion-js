@@ -86,7 +86,7 @@ export default class Accordion {
     trigger.setAttribute('aria-label', trigger.getAttribute(`data-accordion-${open ? 'expanded' : 'collapsed'}-label`) ?? (trigger.getAttribute('aria-label') || ''));
     const index = this.triggerElements.indexOf(trigger);
     const content = this.contentElements[index];
-    const computed = window.getComputedStyle(content);
+    const computed = getComputedStyle(content);
     const start = !content.hidden ? computed.getPropertyValue('block-size') : '0';
     let animation = this.animations[index];
     animation?.cancel();
