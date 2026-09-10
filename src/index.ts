@@ -2,7 +2,7 @@
  * Accordion
  * WAI-ARIA compliant accordion pattern implementation in TypeScript.
  *
- * @version 2.0.14
+ * @version 2.0.15
  * @author Yusuke Kamiyamane
  * @license MIT
  * @copyright Copyright (c) Yusuke Kamiyamane
@@ -146,17 +146,17 @@ export class Accordion {
     this.#cleanupRovingTabIndex?.();
     this.#cleanupRovingTabIndex = null;
 
-    this.#buttons.forEach((button) => {
+    for (const button of this.#buttons) {
       button.destroy();
-    });
+    }
 
     this.#buttons.length = 0;
     !force && (await this.#waitAnimationsFinish());
 
-    this.#contentElements.forEach((content) => {
+    for (const content of this.#contentElements) {
       force && this.#bindings.get(content)?.animation?.finish();
       this.#onContentAnimationFinish(content);
-    });
+    }
 
     this.#animationController?.abort();
     this.#animationController = null;
@@ -260,9 +260,9 @@ export class Accordion {
     trigger.ariaExpanded === 'false' &&
       content.setAttribute('hidden', 'until-found');
 
-    ['block-size', 'overflow'].forEach((name) => {
+    for (const name of ['block-size', 'overflow']) {
       content.style.removeProperty(name);
-    });
+    }
   }
 
   #onContentBeforeMatch = (event: Event): void => {
@@ -440,10 +440,10 @@ export class Accordion {
   async #waitAnimationsFinish(): Promise<void> {
     const promises: Promise<void>[] = [];
 
-    this.#contentElements.forEach((content) => {
+    for (const content of this.#contentElements) {
       const animation = this.#bindings.get(content)?.animation;
       animation && promises.push(waitAnimationFinish(animation));
-    });
+    }
 
     await Promise.allSettled(promises);
   }
